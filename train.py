@@ -17,6 +17,7 @@ parser.add_argument('--action-repeat', type=int, default=8, metavar='N', help='r
 parser.add_argument('--img-stack', type=int, default=4, metavar='N', help='stack N image in a state (default: 4)')
 parser.add_argument('--seed', type=int, default=0, metavar='N', help='random seed (default: 0)')
 parser.add_argument('--render', action='store_true', help='render the environment')
+parser.add_argument('--load', type=bool,default=True, help='use visdom')
 parser.add_argument('--vis', action='store_true', help='use visdom')
 parser.add_argument(
     '--log-interval', type=int, default=10, metavar='N', help='interval between training status logs (default: 10)')
@@ -34,7 +35,7 @@ transition = np.dtype([('s', np.float64, (args.img_stack, 96, 96)), ('a', np.flo
 
 class Env():
     """
-    Environment wrapper for CarRacing 
+    Environment wrapper for CarRacing
     """
 
     def __init__(self):
@@ -177,6 +178,9 @@ class Agent():
     def save_param(self):
         torch.save(self.net.state_dict(), 'param/ppo_net_params.pkl')
 
+    def load_param(self):
+         self.net.load_state_dict(torch.load('param/ppo_net_params.pkl', map_location=lambda storage,   loc: storage))
+
     def store(self, transition):
         self.buffer[self.counter] = transition
         self.counter += 1
@@ -223,6 +227,12 @@ class Agent():
 
 if __name__ == "__main__":
     agent = Agent()
+
+    if args.load:
+        try:
+            agent.load_param()
+        except:
+            print("Unable to load agent")
     env = Env()
     if args.vis:
         draw_reward = DrawLine(env="car", title="PPO", xlabel="Episode", ylabel="Moving averaged episode reward")

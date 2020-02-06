@@ -22,7 +22,7 @@ if use_cuda:
 
 class Env():
     """
-    Test environment wrapper for CarRacing 
+    Test environment wrapper for CarRacing
     """
 
     def __init__(self):
@@ -149,7 +149,7 @@ class Agent():
         return action
 
     def load_param(self):
-        self.net.load_state_dict(torch.load('param/ppo_net_params.pkl'))
+        self.net.load_state_dict(torch.load('param/ppo_net_params.pkl', map_location=lambda storage, loc: storage))
 
 
 if __name__ == "__main__":
